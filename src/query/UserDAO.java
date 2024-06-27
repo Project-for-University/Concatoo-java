@@ -38,12 +38,30 @@ public class UserDAO {
         return users;
     }
 
-    public void deleteUser(String idUser) {
-        String query = "DELETE FROM user WHERE id_user = ?";
+    public int getTotalUsers() {
+        String query = "SELECT COUNT(*) AS total FROM user";
+        try (Connection connection = DatabaseConnector.getConnection();
+                PreparedStatement statement = connection.prepareStatement(query);
+                ResultSet resultSet = statement.executeQuery()) {
+
+            if (resultSet.next()) {
+                return resultSet.getInt("total");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return 0; // Jika terjadi kesalahan, kembalikan 0
+    }
+
+    public void updateUserStatus(String idUser, String newStatus) {
+        String query = "UPDATE user SET status = ? WHERE id_user = ?";
 
         try (Connection connection = DatabaseConnector.getConnection();
                 PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, idUser);
+            statement.setString(1, newStatus);
+            statement.setString(2, idUser);
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

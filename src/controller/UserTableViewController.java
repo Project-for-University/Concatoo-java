@@ -1,18 +1,24 @@
 package controller;
 
-import javafx.fxml.FXML;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import query.UserDAO;
-import model.User;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.Button;
+import query.UserDAO;
+import model.User;
+
+import java.io.IOException;
 
 public class UserTableViewController {
 
@@ -38,6 +44,12 @@ public class UserTableViewController {
     @FXML
     private ImageView logoConcatoo;
 
+    @FXML
+    private Button dashboardButton;
+
+    @FXML
+    private Button listUserButton;
+
     public void initialize() {
         idUserColumn.setCellValueFactory(new PropertyValueFactory<>("idUser"));
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -56,6 +68,23 @@ public class UserTableViewController {
         // Load image
         Image logoImage = new Image(getClass().getResourceAsStream("/images/logo.png"));
         logoConcatoo.setImage(logoImage);
+
+        // Set event handlers for buttons
+        dashboardButton.setOnAction(event -> {
+            try {
+                loadNewScene("/ui/Dashboard.fxml");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+        listUserButton.setOnAction(event -> {
+            try {
+                loadNewScene("/ui/UserTableView.fxml");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     private void addButtonToTable() {
@@ -63,14 +92,17 @@ public class UserTableViewController {
             @Override
             public TableCell<User, Void> call(final TableColumn<User, Void> param) {
                 final TableCell<User, Void> cell = new TableCell<>() {
-                    private final Button deleteButton = new Button("Delete");
+                    private final Button updateButton = new Button("Update Status");
 
                     {
-                        deleteButton.setOnAction(event -> {
+                        updateButton.setOnAction(event -> {
                             User user = getTableView().getItems().get(getIndex());
+                            String newStatus =
+                                    user.getStatus().equals("AKTIF") ? "NONAKTIF" : "AKTIF";
                             UserDAO userDAO = new UserDAO();
-                            userDAO.deleteUser(user.getIdUser());
-                            getTableView().getItems().remove(user);
+                            userDAO.updateUserStatus(user.getIdUser(), newStatus);
+                            user.setStatus(newStatus);
+                            getTableView().refresh();
                         });
                     }
 
@@ -80,7 +112,7 @@ public class UserTableViewController {
                         if (empty) {
                             setGraphic(null);
                         } else {
-                            setGraphic(deleteButton);
+                            setGraphic(updateButton);
                         }
                     }
                 };
@@ -89,5 +121,11 @@ public class UserTableViewController {
         };
 
         actionColumn.setCellFactory(cellFactory);
+    }
+
+    private void loadNewScene(String fxmlPath) throws IOException {
+        Parent newRoot = FXMLLoader.load(getClass().getResource(fxmlPath));
+        Stage currentStage = (Stage) userTable.getScene().getWindow();
+        currentStage.setScene(new Scene(newRoot));
     }
 }

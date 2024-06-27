@@ -9,7 +9,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("/ui/UserTableView.fxml"));
-        Scene scene = new Scene(root, 800, 600);
+        Scene scene = new Scene(root, 1085, 536);
         scene.getStylesheets().add(getClass().getResource("/style/style.css").toExternalForm());
         primaryStage.setTitle("My Application");
         primaryStage.setScene(scene);
