@@ -1,0 +1,9 @@
+/* Mengubah warna background header table */
+.table-view .column-header-background {
+    -fx-background-color: #333333; /* Ubah ini ke warna yang Anda inginkan */
+}
+
+/* Mengubah warna teks header table */
+.table-view .column-header .label {
+    -fx-text-fill: #030712 /* Ubah ini ke warna teks yang Anda inginkan */
+}
